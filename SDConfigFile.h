@@ -34,6 +34,8 @@ class SDConfigFile {
     boolean readNextSetting();
     char *getName();
     char *getValue();
+    int getIntValue();
+    boolean getBooleanValue();
     char *copyValue();
 };
 #endif

@@ -231,3 +231,23 @@ char *SDConfigFile::copyValue() {
   return result;
 }
 
+/*
+ * Returns the value part of the most-recently-read setting
+ * as an integer.
+ */
+int SDConfigFile::getIntValue() {
+  return atoi(getValue());
+}
+
+/*
+ * Returns the value part of the most-recently-read setting
+ * as a boolean.
+ * The value "true" corresponds to true;
+ * all other values correspond to false.
+ */
+boolean SDConfigFile::getBooleanValue() {
+  if (strcmp("true", getValue()) == 0) {
+    return true;
+  }
+  return false;
+}
