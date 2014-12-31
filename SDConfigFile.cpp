@@ -185,6 +185,17 @@ boolean SDConfigFile::readNextSetting() {
 }
 
 /*
+ * Returns true if the most-recently-read setting name
+ * matches the given name, false otherwise.
+ */
+boolean SDConfigFile::nameIs(char *name) {
+  if (strcmp(name, _line) == 0) {
+    return true;
+  }
+  return false;
+}
+
+/*
  * Returns the name part of the most-recently-read setting.
  * WARNING: calling this when an error has occurred can crash your sketch.
  */

@@ -27,8 +27,8 @@
  * 2) copy the examples/SDConfigFileExample/example.cfg file
  *    to the SD card.
  * 3) Download and run this Sketch
- * 4) Open the Serial Monitor at 115200 baud.
- * See that the Serial Monitors shows the settings
+ * 4) Open the Serial Monitor at 9600 baud.
+ * See that the Serial Monitor shows the settings
  * and the greeting, and the hello message is printed
  * with the timing given in the configuration file.
  *
@@ -44,11 +44,16 @@ const char CONFIG_FILE[] = "example.cfg";
 
 /*
  * Settings we read from the configuration file.
+ *   didReadConfig = true if the configuration-reading succeeded;
+ *     false otherwise.
+ *     Used to prevent odd behaviors if the configuration file
+ *     is corrupt or missing.
  *   hello = the "hello world" string, allocated via malloc().
  *   doDelay = if true, delay waitMs in loop().
  *     if false, don't delay.
  *   waitMs = time (milliseconds) to wait after printing hello.
  */
+boolean didReadConfig;
 char *hello;
 boolean doDelay;
 int waitMs;
@@ -56,9 +61,15 @@ int waitMs;
 boolean readConfiguration();
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   pinMode(pinSelectSD, OUTPUT);
+
+  didReadConfig = false;
+  hello = 0;
+  doDelay = false;
+  waitMs = 0;
+  
   
   // Setup the SD card 
   Serial.println("Calling SD.begin()...");
@@ -72,21 +83,23 @@ void setup() {
   Serial.println("...succeeded.");
 
   // Read our configuration from the SD card file.
-  if (!readConfiguration()) {
-    // The configuration reading failed.
-    return;
-  }
-
+  didReadConfig = readConfiguration();
 }
 
 void loop() {
-  
+
   /*
-   * If we read the configuration file,
+   * If we didn't read the configuration, do nothing.
+   */
+   
+  if (!didReadConfig) {
+    return;
+  }
+
+  /*
    * print the hello message,
    * then wait the configured time.
    */
-   
   if (hello) {
 
     Serial.println(hello);
@@ -124,10 +137,10 @@ boolean readConfiguration() {
   // Read each setting from the file.
   while (cfg.readNextSetting()) {
     
-    // Put a strcmp() block here for each setting you have.
+    // Put a nameIs() block here for each setting you have.
     
     // doDelay
-    if (strcmp("doDelay", cfg.getName()) == 0) {
+    if (cfg.nameIs("doDelay")) {
       
       doDelay = cfg.getBooleanValue();
       Serial.print("Read doDelay: ");
@@ -138,14 +151,14 @@ boolean readConfiguration() {
       }
     
     // waitMs integer
-    } else if (strcmp("waitMs", cfg.getName()) == 0) {
+    } else if (cfg.nameIs("waitMs")) {
       
       waitMs = cfg.getIntValue();
       Serial.print("Read waitMs: ");
       Serial.println(waitMs);
 
     // hello string (char *)
-    } else if (strcmp("hello", cfg.getName()) == 0) {
+    } else if (cfg.nameIs("hello")) {
       
       // Dynamically allocate a copy of the string.
       hello = cfg.copyValue();

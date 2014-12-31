@@ -32,6 +32,7 @@ class SDConfigFile {
     boolean begin(const char *configFileName, uint8_t maxLineLength);
     void end();
     boolean readNextSetting();
+    boolean nameIs(char *name);
     char *getName();
     char *getValue();
     int getIntValue();
