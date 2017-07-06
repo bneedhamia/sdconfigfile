@@ -188,7 +188,7 @@ boolean SDConfigFile::readNextSetting() {
  * Returns true if the most-recently-read setting name
  * matches the given name, false otherwise.
  */
-boolean SDConfigFile::nameIs(char *name) {
+boolean SDConfigFile::nameIs(const char *name) {
   if (strcmp(name, _line) == 0) {
     return true;
   }
@@ -197,29 +197,32 @@ boolean SDConfigFile::nameIs(char *name) {
 
 /*
  * Returns the name part of the most-recently-read setting.
+ * or null if an error occurred.
  * WARNING: calling this when an error has occurred can crash your sketch.
  */
-char *SDConfigFile::getName() {
+const char *SDConfigFile::getName() {
   if (_lineLength <= 0 || _valueIdx <= 1) {
-    return "ERROR";
+    return 0;
   }
   return &_line[0];
 }
 
 /*
- * Returns the value part of the most-recently-read setting.
+ * Returns the value part of the most-recently-read setting,
+ * or null if there was an error.
  * WARNING: calling this when an error has occurred can crash your sketch.
  */
-char *SDConfigFile::getValue() {
+const char *SDConfigFile::getValue() {
   if (_lineLength <= 0 || _valueIdx <= 1) {
-    return "ERROR";
+    return 0;
   }
   return &_line[_valueIdx];
 }
 
 /*
- * Returns a persistent copy of the value part
- * of the most-recently-read setting.
+ * Returns a persistent, dynamically-allocated copy of the value part
+ * of the most-recently-read setting, or null if a failure occurred.
+ * 
  * Unlike getValue(), the return value of this function
  * persists after readNextSetting() is called or end() is called.
  */
@@ -228,13 +231,13 @@ char *SDConfigFile::copyValue() {
   int length;
 
   if (_lineLength <= 0 || _valueIdx <= 1) {
-    return "ERROR";
+    return 0; // begin() wasn't called, or failed.
   }
 
   length = strlen(&_line[_valueIdx]);
   result = (char *) malloc(length + 1);
   if (result == 0) {
-    return "OUT OF MEMORY";
+    return 0; // out of memory
   }
   
   strcpy(result, &_line[_valueIdx]);
@@ -244,10 +247,14 @@ char *SDConfigFile::copyValue() {
 
 /*
  * Returns the value part of the most-recently-read setting
- * as an integer.
+ * as an integer, or 0 if an error occurred.
  */
 int SDConfigFile::getIntValue() {
-  return atoi(getValue());
+  const char *str = getValue();
+  if (!str) {
+    return 0;
+  }
+  return atoi(str);
 }
 
 /*

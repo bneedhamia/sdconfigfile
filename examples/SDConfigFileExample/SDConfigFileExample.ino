@@ -174,5 +174,7 @@ boolean readConfiguration() {
   
   // clean up
   cfg.end();
+  
+  return true;
 }
 

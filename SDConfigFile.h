@@ -4,7 +4,7 @@
 /*
  * SD card configuration file reading library
  *
- * Copyright (c) 2014 Bradford Needham
+ * Copyright (c) 2014, 2017 Bradford Needham
  * (@bneedhamia, https://www.needhamia.com )
  * Licensed under LGPL version 2.1
  * a version of which should have been supplied with this file.
@@ -32,9 +32,9 @@ class SDConfigFile {
     boolean begin(const char *configFileName, uint8_t maxLineLength);
     void end();
     boolean readNextSetting();
-    boolean nameIs(char *name);
-    char *getName();
-    char *getValue();
+    boolean nameIs(const char *name);
+    const char *getName();
+    const char *getValue();
     int getIntValue();
     boolean getBooleanValue();
     char *copyValue();
